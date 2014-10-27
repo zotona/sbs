@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SBS.iml" filepath="$PROJECT_DIR$/SBS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sbs/sbs.iml" filepath="$PROJECT_DIR$/sbs/sbs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sbs.iml" filepath="$PROJECT_DIR$/sbs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sbs/sbs-sbs.iml" filepath="$PROJECT_DIR$/sbs/sbs-sbs.iml" />
     </modules>
   </component>
 </project>

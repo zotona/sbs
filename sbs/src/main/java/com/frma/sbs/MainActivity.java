@@ -23,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.ahmet.autoswitch.AutoSwitchList;
@@ -35,7 +36,16 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
+class SBSException extends Exception {
+    public int mErrcode;
+    SBSException(String msg, int errcode) {
+        super(msg);
+        mErrcode = errcode;
+    }
+    public int getErrCode() {
+        return mErrcode;
+    }
+}
 
 public class MainActivity extends Activity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
     private SharedPreferences mPrefs;
