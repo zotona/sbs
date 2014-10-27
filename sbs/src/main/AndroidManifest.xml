@@ -10,13 +10,31 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.ahmet.autoswitch.AutoSwitchList"
+            android:label="@string/title_activity_auto_switch_list" >
+        </activity>
+
+        <service
+            android:name="com.ahmet.autoswitch.AppWatcherService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".SBSManager"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
 </manifest>

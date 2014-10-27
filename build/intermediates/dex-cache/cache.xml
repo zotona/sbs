@@ -2,16 +2,10 @@
 <pre-dex-items>
 
     <item
-        dex="/home/frma/proj/workspace/SBS/sbs/build/intermediates/pre-dexed/debug/native-libs-41404cd38c3c36d182f3a6cdc2c3d25d9b965178.jar"
-        jar="/home/frma/proj/workspace/SBS/sbs/build/native-libs/native-libs.jar"
+        dex="/Users/ahmet/Desktop/sbs-Tasker/sbs/build/intermediates/pre-dexed/debug/native-libs-ff661bef7e8d850eab565e2e0b0b70bd9ecf7a66.jar"
+        jar="/Users/ahmet/Desktop/sbs-Tasker/sbs/build/native-libs/native-libs.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="4c0d379c8775010d40d80a28becb75384f89b58e"/>
-    <item
-        dex="/home/frma/proj/sbs/sbs/build/intermediates/pre-dexed/debug/native-libs-b03687352b23e01702e00871f5ac60dcc7d3531b.jar"
-        jar="/home/frma/proj/sbs/sbs/build/native-libs/native-libs.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="39d3e8d6a0ec44f608ac860800b6349497c4e4c5"/>
+        sha1="44c5bd53461ed94b1fa5af046f1520d66bc5b947"/>
 
 </pre-dex-items>

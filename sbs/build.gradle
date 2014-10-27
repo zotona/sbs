@@ -36,4 +36,4 @@ dependencies {
     //compile 'com.android.support:support-v4:19.+'
 }
 
-apply from: '../../workspace/signapk.gradle'
+//apply from: '../../workspace/signapk.gradle'

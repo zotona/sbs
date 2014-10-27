@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SBS.iml" filepath="$PROJECT_DIR$/SBS.iml" />
       <module fileurl="file://$PROJECT_DIR$/sbs/sbs.iml" filepath="$PROJECT_DIR$/sbs/sbs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sbs-Tasker.iml" filepath="$PROJECT_DIR$/sbs-Tasker.iml" />
     </modules>
   </component>
 </project>
