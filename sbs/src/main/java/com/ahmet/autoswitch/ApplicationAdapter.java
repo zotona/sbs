@@ -18,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.frma.sbs.R;
 
@@ -83,7 +82,6 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             ApplicationInfo data = appsList.get((Integer)buttonView.getTag());
-            Toast.makeText(context, data.packageName, Toast.LENGTH_LONG).show();
             activity.setAppStatus(data.packageName,isChecked);
         }
     };
