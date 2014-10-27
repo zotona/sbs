@@ -59,8 +59,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
     private boolean mEnabled = false;
     private ProgressDialog mProgress;
 
-    private static String absolutePath;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +69,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        absolutePath = getFilesDir().getAbsolutePath();
 
         mInstallBtn = (Button)findViewById(R.id.install);
         mRebootBtn =  (Button)findViewById(R.id.reboot);
@@ -345,24 +342,24 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    public static int runAsRoot(String cmd) {
+    public int runAsRoot(String cmd) {
         int rv = -1;
-        //logi("RunAsRoot: " + cmd);
+        logi("RunAsRoot: " + cmd);
         try {
             Process process =
                 Runtime.getRuntime().exec(new String[] {"su", "-mm", "-c", cmd});
             rv = process.waitFor();
-            //logi("runAsRoot returned " + rv);
+            logi("runAsRoot returned " + rv);
         } catch (Exception e) {
-            //logi("Failed to run as root with exception: " + e.getMessage());
-            //Toast.makeText(this, "Failed to run as root", Toast.LENGTH_LONG).show();
+            logi("Failed to run as root with exception: " + e.getMessage());
+            Toast.makeText(this, "Failed to run as root", Toast.LENGTH_LONG).show();
         }
         return rv;
     }
-    public static int runSBSCmd(String cmd) {
-        return runAsRoot(absolutePath + "/sbs.sh " + cmd);
+    public int runSBSCmd(String cmd) {
+        return runAsRoot(getFilesDir().getAbsolutePath() + "/sbs.sh " + cmd);
     }
-    public static int runAndCheckSBSCmd(String cmd) throws SBSException {
+    public int runAndCheckSBSCmd(String cmd) throws SBSException {
         int rv = runSBSCmd(cmd);
         if(rv != 0) {
             throw new SBSException("SBS Command failed with error " + rv, rv);
