@@ -342,7 +342,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    public int runAsRoot(String cmd) {
+    private int runAsRoot(String cmd) {
         int rv = -1;
         logi("RunAsRoot: " + cmd);
         try {
@@ -356,10 +356,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         }
         return rv;
     }
-    public int runSBSCmd(String cmd) {
+    private int runSBSCmd(String cmd) {
         return runAsRoot(getFilesDir().getAbsolutePath() + "/sbs.sh " + cmd);
     }
-    public int runAndCheckSBSCmd(String cmd) throws SBSException {
+    private int runAndCheckSBSCmd(String cmd) throws SBSException {
         int rv = runSBSCmd(cmd);
         if(rv != 0) {
             throw new SBSException("SBS Command failed with error " + rv, rv);
