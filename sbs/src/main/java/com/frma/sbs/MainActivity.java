@@ -357,7 +357,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         return rv;
     }
     private int runSBSCmd(String cmd) {
-        return runAsRoot(getFilesDir().getAbsolutePath() + "/sbs.sh " + cmd);
+        String path = getFilesDir().getAbsolutePath();
+        return runAsRoot(path + "/sbs.sh " + cmd);
     }
     private int runAndCheckSBSCmd(String cmd) throws SBSException {
         int rv = runSBSCmd(cmd);
