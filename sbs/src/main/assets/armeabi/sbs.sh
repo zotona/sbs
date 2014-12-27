@@ -63,14 +63,14 @@ echo "$CMVER" | grep "^11"  > /dev/null && ISCM11=1
 log "Got IS44=$IS44 IS50=$IS50 ISCM11=$ISCM11"
 if [ -z "$VARIANT" ] ; then
     if [ "$ISCM11" = "1" ] ; then
-	  VARIANT=cm11m9
+	  VARIANT=cm11m12
     elif [ "$IS44" = "1" ] ; then
-	  VARIANT=aosp444-102
+	  VARIANT=aosp444_r2
     elif [ "$IS50" = "1" ] ; then
-	  VARIANT=aosp500
+	  VARIANT=aosp501_r1
     else
-	    log "No matching shared library"
-	    exit 108
+	  log "No matching shared library"
+	  exit 108
     fi
 fi
 
