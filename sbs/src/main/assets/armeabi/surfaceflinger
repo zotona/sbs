@@ -7,7 +7,9 @@ if [ -e /data/system/sbs/enabled -o -e /data/system/sbs/permanent ] ; then
     rm -f /data/system/sbs/enabled
     log -t SBS "Ok, use libsurfaceflinger.so with SBS support"
     export LD_LIBRARY_PATH=/system/lib/sbs
+    exec /system/lib/sbs/surfaceflinger $*
 else
     log -t SBS "Is not enabled"
 fi
 exec /system/bin/surfaceflinger.real $*
+

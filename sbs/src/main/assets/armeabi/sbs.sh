@@ -162,7 +162,7 @@ function cmd_isenabled () {
 }
 
 function cmd_isloaded () {
-    if grep /system/lib/sbs /proc/$(bbpidof surfaceflinger.real)/maps > /dev/null 2>&1 ; then
+    if ps | grep /system/lib/sbs/surfaceflinger > /dev/null 2>&1 ; then
         log "Result: Yes"
         return 0
     else
