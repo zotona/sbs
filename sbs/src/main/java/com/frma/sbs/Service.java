@@ -22,9 +22,6 @@ public class Service extends IntentService {
     static final String SBS_SET = "com.frma.sbs.action.SBS_SET";
     static final String SBS_NEW_STATUS = "com.frma.sbs.action.STATUS";
     private DisplayMetrics mDisplayMetrics;
-    private boolean mSavedOn = false;
-    private int mSavedZoom = 255;
-    private int mSavedImgDistance = 60;
     private SharedPreferences mPrefs;
 
     public static void setSBS(Context context, boolean on, int zoom, int imgDistance) {
@@ -63,9 +60,9 @@ public class Service extends IntentService {
                 String cmd = intent.getStringExtra("CMD");
                 handleSBSControl(cmd);
             } else if (SBS_SET.equals(action)) {
-                boolean on = intent.getBooleanExtra("ON", false);
-                int zoom = intent.getIntExtra("ZOOM", 100);
-                int imgDistance = intent.getIntExtra("IMGDIST", 60);
+                boolean on = intent.getBooleanExtra("ON", mPrefs.getBoolean("ON", false));
+                int zoom = intent.getIntExtra("ZOOM", mPrefs.getInt("zoom", 100));
+                int imgDistance = intent.getIntExtra("IMGDIST", mPrefs.getInt("imgdist", 60));
                 handleSBSSet(on, zoom, imgDistance);
             }
         }
@@ -97,6 +94,7 @@ public class Service extends IntentService {
         try {
             mPrefs.edit().putInt("zoom" ,zoom).commit();
             mPrefs.edit().putInt("imgdist", imgDistance).commit();
+
             int rv = runAndCheckSBSCmd(String.format("set %d %d %d", on ? 1 : 0, zoom,
                     (int) (imgDistance / 25.4 * mDisplayMetrics.xdpi)));
         } catch (SBSException e) {
