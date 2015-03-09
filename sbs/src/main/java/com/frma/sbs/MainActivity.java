@@ -48,8 +48,6 @@ public class MainActivity extends Activity implements
         CompoundButton.OnCheckedChangeListener,
         SeekBar.OnSeekBarChangeListener
 {
-    private SharedPreferences mPrefs;
-
     private Button mInstallBtn;
     private Button mRebootBtn;
     private CheckBox mLoadNextCB;
@@ -81,8 +79,6 @@ public class MainActivity extends Activity implements
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         mInstallBtn = (Button)findViewById(R.id.install);
         mRebootBtn =  (Button)findViewById(R.id.reboot);
         mLoadNextCB = (CheckBox)findViewById(R.id.loadNextBoot);
@@ -104,13 +100,8 @@ public class MainActivity extends Activity implements
         mActivateTB.setOnCheckedChangeListener(this);
 
         mZoomSeekBar.setOnSeekBarChangeListener(this);
-        mZoom = mPrefs.getInt("zoom", 255);
-        mZoomSeekBar.setProgress(mZoom);
 
         mImgDistSeekBar.setOnSeekBarChangeListener(this);
-        mImgDist = mPrefs.getInt("imgdist", 60);
-        mImgDistSeekBar.setProgress(mImgDist);
-
         mImgDistSeekBar.setMax((int) ((float) displayMetrics.heightPixels / displayMetrics.ydpi * 25.4));
 
         mProgress = new ProgressDialog(this);
@@ -173,7 +164,9 @@ public class MainActivity extends Activity implements
                                "is not installed");
         mCurrentStatusTV.setText(statusText);
         mZoomSeekBar.setEnabled(mLoaded);
+        mZoomSeekBar.setProgress(mZoom);
         mImgDistSeekBar.setEnabled(mLoaded);
+        mImgDistSeekBar.setProgress(mImgDist);
         mActivateTB.setEnabled(mLoaded);
         mInItemUpdate = false;
     }
@@ -232,14 +225,14 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        if(mInItemUpdate)
+            return;
         if (seekBar == mImgDistSeekBar) {
             mProgress.show();
-            mPrefs.edit().putInt("imgdist", seekBar.getProgress()).commit();
             Service.setSBS(this, mActive, mZoom, seekBar.getProgress());
         }
         else if(seekBar == mZoomSeekBar) {
             mProgress.show();
-            mPrefs.edit().putInt("zoom", seekBar.getProgress()).commit();
             Service.setSBS(this, mActive, seekBar.getProgress(), mImgDist);
         }
     }

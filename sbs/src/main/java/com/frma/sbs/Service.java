@@ -23,8 +23,9 @@ public class Service extends IntentService {
     static final String SBS_NEW_STATUS = "com.frma.sbs.action.STATUS";
     private DisplayMetrics mDisplayMetrics;
     private boolean mSavedOn = false;
-    private int mSavedZoom = 100;
+    private int mSavedZoom = 255;
     private int mSavedImgDistance = 60;
+    private SharedPreferences mPrefs;
 
     public static void setSBS(Context context, boolean on, int zoom, int imgDistance) {
         Intent intent = new Intent(context, Service.class);
@@ -51,6 +52,7 @@ public class Service extends IntentService {
         Display display = window.getDefaultDisplay();
         mDisplayMetrics = new DisplayMetrics();
         display.getMetrics(mDisplayMetrics);
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -93,9 +95,8 @@ public class Service extends IntentService {
     }
     private void handleSBSSet(boolean on, int zoom, int imgDistance) {
         try {
-            mSavedOn = on;
-            mSavedZoom = zoom;
-            mSavedImgDistance = imgDistance;
+            mPrefs.edit().putInt("zoom" ,zoom).commit();
+            mPrefs.edit().putInt("imgdist", imgDistance).commit();
             int rv = runAndCheckSBSCmd(String.format("set %d %d %d", on ? 1 : 0, zoom,
                     (int) (imgDistance / 25.4 * mDisplayMetrics.xdpi)));
         } catch (SBSException e) {
@@ -112,8 +113,8 @@ public class Service extends IntentService {
         boolean permanent = false;
         boolean loaded = false;
         boolean active = false;
-        int zoom = mSavedZoom;
-        int imgDistance = mSavedImgDistance;
+        int zoom = mPrefs.getInt("zoom", 200);
+        int imgDistance = mPrefs.getInt("imgdist", 60);
 
         Intent intent = new Intent(SBS_NEW_STATUS);
 
