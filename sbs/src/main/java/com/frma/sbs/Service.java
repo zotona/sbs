@@ -11,6 +11,12 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -69,20 +75,20 @@ public class Service extends IntentService {
     }
 
     private void handleSBSControl(String cmd) {
-        int rv = 0;
+        String o;
         try {
             if (cmd.equals("install")) {
-                rv = runAndCheckSBSCmd("install");
+                o = runAndCheckSBSCmd("install");
             } else if (cmd.equals("uninstall")) {
-                rv = runAndCheckSBSCmd("uninstall");
+                o = runAndCheckSBSCmd("uninstall");
             } else if (cmd.equals("enablenext")) {
-                rv = runAndCheckSBSCmd("enable");
+                o = runAndCheckSBSCmd("enable");
             } else if (cmd.equals("enablepermanent")) {
-                rv = runAndCheckSBSCmd("enablepermanent");
+                o = runAndCheckSBSCmd("enablepermanent");
             } else if (cmd.equals("disable")) {
-                rv = runAndCheckSBSCmd("disable");
+                o = runAndCheckSBSCmd("disable");
             } else if (cmd.equals("reboot")) {
-                rv = runAndCheckSBSCmd("reboot");
+                o = runAndCheckSBSCmd("reboot");
                 while(true);
             }
         } catch(SBSException e) {
@@ -95,8 +101,8 @@ public class Service extends IntentService {
             mPrefs.edit().putInt("zoom" ,zoom).commit();
             mPrefs.edit().putInt("imgdist", imgDistance).commit();
 
-            int rv = runAndCheckSBSCmd(String.format("set %d %d %d", on ? 1 : 0, zoom,
-                    (int) (imgDistance / 25.4 * mDisplayMetrics.xdpi)));
+            String o = runAndCheckSBSCmd(String.format("set %d %d %d", on ? 1 : 0, zoom,
+                                        (int)(imgDistance / 25.4 * mDisplayMetrics.xdpi)));
         } catch (SBSException e) {
             e.printStackTrace();
         }
@@ -116,26 +122,23 @@ public class Service extends IntentService {
 
         Intent intent = new Intent(SBS_NEW_STATUS);
 
-        int rv = 0;
-        rv = runSBSCmd("isinstalled");
-        if(rv == 0 || rv == 1) {
-            installed = (rv == 0);
-            rv = runSBSCmd("isenabled");
+        String o = runSBSCmd("isinstalled");
+        if(o.startsWith("RESULT:")) {
+            installed = o.contains("YES");
+            o = runSBSCmd("isenabled");
         }
-        if(rv == 0 || rv == 1) {
-            enabled = (rv == 0);
-            rv = runSBSCmd("ispermanent");
+        if(o.startsWith("RESULT:")) {
+            enabled = o.contains("YES");
+            o = runSBSCmd("ispermanent");
         }
-        if(rv == 0 || rv == 1) {
-            permanent = (rv == 0);
-            rv = runSBSCmd("isloaded");
+        if(o.startsWith("RESULT:")) {
+            permanent = o.contains("YES");
+            o = runSBSCmd("isloaded");
         }
-        if(rv == 0 || rv == 1) {
-            loaded = (rv == 0);
-            rv = 0;
+        if(o.startsWith("RESULT:")) {
+            loaded = o.contains("YES");
         }
-        intent.putExtra("ERROR", rv);
-        if(rv == 0) {
+        if(o.startsWith("RESULT:")) {
             intent.putExtra("INSTALLED", installed);
             intent.putExtra("ENABLED", enabled);
             intent.putExtra("PERMANENT", permanent);
@@ -145,35 +148,45 @@ public class Service extends IntentService {
             intent.putExtra("IMGDIST", imgDistance);
         }
         else {
-            intent.putExtra("ERROR_MSG", "rv=" + rv);
+            intent.putExtra("ERROR_MSG", o);
         }
         getApplicationContext().sendBroadcast(intent);
     }
-
-    private int runAsRoot(String cmd) {
-        int rv = -1;
+    public static String readAll(InputStream stream) throws IOException, UnsupportedEncodingException {
+        int n = 0;
+        char[] buffer = new char[1024 * 4];
+        InputStreamReader reader = new InputStreamReader(stream, "UTF8");
+        StringWriter writer = new StringWriter();
+        while (-1 != (n = reader.read(buffer))) writer.write(buffer, 0, n);
+        return writer.toString();
+    }
+    private String runAsRoot(String cmd) {
+        String output;
         logi("RunAsRoot: " + cmd);
         try {
             Process process =
                     Runtime.getRuntime().exec(new String[] {"su", "-mm", "-c", cmd});
-            rv = process.waitFor();
+            output = readAll(process.getInputStream());
+            int rv = process.waitFor();
+            logi("Got output: " + output + " of len " + output.length());
             logi("runAsRoot returned " + rv);
         } catch (Exception e) {
             logi("Failed to run as root with exception: " + e.getMessage());
             Toast.makeText(this, "Failed to run as root", Toast.LENGTH_LONG).show();
+            output = "Exception while executing external command:" + e.getMessage();
         }
-        return rv;
+        return output;
     }
-    private int runSBSCmd(String cmd) {
+    private String runSBSCmd(String cmd) {
         String path = getFilesDir().getAbsolutePath();
         return runAsRoot(path + "/sbs.sh " + cmd);
     }
-    private int runAndCheckSBSCmd(String cmd) throws SBSException {
-        int rv = runSBSCmd(cmd);
-        if(rv != 0) {
-            throw new SBSException("SBS Command failed with error " + rv, rv);
+    private String runAndCheckSBSCmd(String cmd) throws SBSException {
+        String o = runSBSCmd(cmd);
+        if(o.startsWith("ERROR:")) {
+            throw new SBSException("SBS Command failed with error " + o,-1);
         }
-        return rv;
+        return o;
     }
     private void logd(String msg) {
         Log.d("SBS", msg);

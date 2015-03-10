@@ -9,6 +9,17 @@ log () {
     /system/bin/log -t SBS $*
     echo $* >> $LOG
 }
+err () {
+    log $*
+    EC=$1
+    shift
+    echo "ERROR: $*"
+    exit $EC
+}
+rok () {
+    log "RESULT: $*"
+    echo "RESULT: $*"
+}
 
 # Busybox comands
 bbcp ()     { $BINDIR/busybox cp $* ; }
@@ -23,6 +34,7 @@ bbchmod()   { $BINDIR/busybox chmod $* ; }
 # Built in commands
 bimount ()  { mount $* ; }
 bichown ()  { chown $* ; }
+bichcon ()  { chcon $* ; }
 
 
 # Wrappers for busybox
@@ -56,32 +68,22 @@ VER=$(getprop ro.build.version.release)
 CMVER=$(getprop ro.cm.version)
 
 log "VER:$VER CMVER:$CMVER"
-echo "$VER"   | grep "^4.4" > /dev/null && IS44=1
-echo "$VER"   | grep "^5.0" > /dev/null && IS50=1
-echo "$CMVER" | grep "^11"  > /dev/null && ISCM11=1
+echo "$VER"   | grep "^4.4" > /dev/null && VARIANT=aosp444_r2
+echo "$VER"   | grep "^5.0" > /dev/null && VARIANT=aosp501_r1
+echo "$CMVER" | grep "^11"  > /dev/null && VARIANT=cm11m12
+echo "$CMVER" | grep "^12"  > /dev/null && VARIANT=cm12
 
-log "Got IS44=$IS44 IS50=$IS50 ISCM11=$ISCM11"
 if [ -z "$VARIANT" ] ; then
-    if [ "$ISCM11" = "1" ] ; then
-	  VARIANT=cm11m12
-    elif [ "$IS44" = "1" ] ; then
-	  VARIANT=aosp444_r2
-    elif [ "$IS50" = "1" ] ; then
-	  VARIANT=aosp501_r1
-    else
-	  log "No matching shared library"
-	  exit 108
-    fi
+	  err 101 "No matching shared library"
 fi
 
 log "Selected variant: $VARIANT"
 
-test -e $BB || ( log "Failed to copy busybox to $BB" 2>&1 ; exit 104 )
+test -e $BB || ( err 102 "Failed to copy busybox to $BB" 2>&1 ;)
 
 function cmd_install () {
     if [ -e /system/bin/surfaceflinger.real ] ; then
-        log "/system/bin/surfaceflinger.real already exists, please uninstall first"
-        exit 1
+        err 103 "/system/bin/surfaceflinger.real already exists, please uninstall first"
     fi
     bbmkdir /data/system/sbs
 
@@ -94,7 +96,7 @@ function cmd_install () {
     bbcp /data/data/com.frma.sbs/files/surfaceflinger-$VARIANT       /system/lib/sbs/surfaceflinger
     bbchmod 644 /system/lib/sbs/libsurfaceflinger.so
     bbchmod 755 /system/lib/sbs/surfaceflinger
-
+    bichcon u:object_r:surfaceflinger_exec:s0 /system/lib/sbs/surfaceflinger
     log "Replacing /system/bin/surfaceflinger with wrapper"
     bbcp /system/bin/surfaceflinger /data/data/com.frma.sbs/files/surfaceflinger.org
     bbmv /system/bin/surfaceflinger /system/bin/surfaceflinger.real
@@ -118,10 +120,10 @@ function cmd_uninstall () {
 
 function cmd_isinstalled () {
         if [ -e /system/bin/surfaceflinger.real ] ; then
-            log "Result: Yes"
+            rok "YES"
             return 0
         else
-            log "Result: No"
+            rok "NO"
             return 1
         fi
 }
@@ -129,45 +131,42 @@ function cmd_isinstalled () {
 function cmd_enable () {
     bbmkdir /data/system/sbs
     bbtouch /data/system/sbs/enabled
+    rok "OK"
 }
 
 function cmd_enable_permanent () {
     bbmkdir /data/system/sbs
     bbtouch /data/system/sbs/permanent
+    rok "OK"
 }
 
 function cmd_disable () {
     bbrm -f /data/system/sbs/enabled
     bbrm -f /data/system/sbs/permanent
+    rok "OK"
 }
 
 function cmd_ispermanent () {
     if [ -e /data/system/sbs/permanent ] ; then
-        log "Result: Yes"
-        return 0
+        rok "YES"
     else
-        log "Result: No"
-        return 1
+        rok "NO"
     fi
 }
 
 function cmd_isenabled () {
     if [ -e /data/system/sbs/enabled ] ; then
-        log "Result: Yes"
-        return 0
+        rok "YES"
     else
-        log "Result: No"
-        return 1
+        rok "NO"
     fi
 }
 
 function cmd_isloaded () {
     if ps | grep /system/lib/sbs/surfaceflinger > /dev/null 2>&1 ; then
-        log "Result: Yes"
-        return 0
+        rok "YES"
     else
-        log "Result: No"
-        return 1
+        rok "NO"
     fi
 }
 
@@ -181,8 +180,8 @@ function cmd_set () {
         ZOOM=$2
         IMGDIST=$3
         R=$(service call SurfaceFlinger 4711 i32 $FLAGS i32 $ZOOM i32 $IMGDIST)
-	    log "Result: $R"
-	    echo "$R" | grep "^Result: Parcel(NULL)" && ( echo "Ok" ; exit 0 ) || ( log "Not installed" ; exit 106)
+	log "Result: $R"
+	echo "$R" | grep "^Result: Parcel(NULL)" && ( rok "OK"; exit 0 ) || ( err 104 "Not installed")
 }
 case $1 in
     install)
@@ -213,18 +212,16 @@ case $1 in
         ;;
     isloaded)
         cmd_isloaded
-	;;
+	    ;;
     reboot)
 	    cmd_reboot
-	;;
+	    ;;
     set)
         cmd_set $2 $3 $4
         ;;
     *)
-	    log "SBS: Unknown subcommand: $1"
-	    exit 107
+	    err 105 "Unknown subcommand: $1"
 	;;
 esac
-exit $?
 
 

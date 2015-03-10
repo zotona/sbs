@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -159,9 +161,16 @@ public class MainActivity extends Activity implements
         mLoadNextCB.setChecked(mEnabled);
         mPermanentCB.setChecked(mPermanent);
         String statusText = "SBS ";
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            statusText += "v" + pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         statusText += (mInstalled ?
-                        ("is installed" + (mLoaded ? " and loaded": " but not loaded")) :
-                               "is not installed");
+                        (" is installed" + (mLoaded ? " and loaded": " but not loaded")) :
+                               " is not installed");
         mCurrentStatusTV.setText(statusText);
         mZoomSeekBar.setEnabled(mLoaded);
         mZoomSeekBar.setProgress(mZoom);
