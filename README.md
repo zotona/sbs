@@ -40,7 +40,8 @@ Device    | ROM                    | Reported by       | Status
 ----------|------------------------|-------------------|-----------------------
 N5        | GPE5.0.1               | Fredrik Markström | Working           
 I9505     | cm-12-20150308-NIGHTLY-jfltexx | Fredrik Markström    | Working
-	
+Moto G XT1031 | 4.4.4              | Devon Mangelsen   | Working
+
 OnePlus One | CM 20150310-NIGHTLY-bacon | Ben Mooney | Working
 
 Status (Beta)
