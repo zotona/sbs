@@ -19,9 +19,11 @@ again and it *should* boot fine. If you select the "Dangerous" option you might 
 If your device fails to boot, read the "To manually undo everything SBS has done to your device"
 chapter below.
 
-- This has only been tested on AOKP_jflte_kitkat_nightly_2014-05-24 (AOKP based on 4.4.2 on Samsung
-  S4 - I9505), but probably works with all CM11 based KitKat roms. (And possibly some KitKat stock
+- *The beta version* has only been tested on AOKP_jflte_kitkat_nightly_2014-05-24 (AOKP based on 4.4.2 on Samsung
+  S4 - I9505), but probably works with most CM11 based KitKat roms. (And possibly some KitKat stock
   ROMs)
+- *The alpha version" has only been tested on Nexus 5 - GPE5.0.1 and CM12 on SGS4/I9505
+   (cm-12-20150308-NIGHTLY-jfltexx.zip), but probably works with other CM12 based AOSP Lollipopp roms.
 - If the phone hangs, reboot it.
 - I use it with a bluetooth mouse and have watched hours and hours of movies with it (mostly when flying).
 
@@ -32,7 +34,15 @@ strong side. So if someone wants to help rewrite this into something neater I'd 
 
 Please report success and fail with device name and os version in the community https://plus.google.com/u/0/communities/117807409036006925326?cfem=1
 
-Status
+Status (Alpha)
+
+Device    | ROM                    | Reported by       | Status                           
+----------|------------------------|-------------------|-----------------------
+N5        | GPE5.0.1               | Fredrik Markström | Working           
+I9505     | cm-12-20150308-NIGHTLY-jfltexx | Fredrik Markström    | Working
+
+
+Status (Beta)
 
 Device    | ROM                    | Reported by       | Status                           
 ----------|------------------------|-------------------|-----------------------
@@ -71,11 +81,14 @@ To manually undo everything SBS has done to your device
 
    mv /system/bin/surfaceflinger.real /system/bin/surfaceflinger
 
-4) Unmount /system again
+4) Remove sbs binaries
+   rm -rf /system/lib/sbs
+
+5) Unmount /system again
    
    umount /system
    
-5) Reboot phone
+6) Reboot phone
    
    reboot
 
