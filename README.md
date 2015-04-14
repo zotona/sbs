@@ -43,6 +43,8 @@ N5        | Stock 5.0.1            | Fredrik Markström | Working
 SGS4(I9505)     | cm-12-20150308-NIGHTLY-jfltexx | Fredrik Markström    | Working
 Moto G XT1031 | Stock 4.4.4              | Devon Mangelsen   | Working
 OnePlus One | CM 20150310-NIGHTLY-bacon | Ben Mooney | Working
+OnePlus One | CM 20150310-NIGHTLY-bacon | Ben Mooney | Working
+OnePlus One | CMOS12 (cm-12.0-YNG1TAS0YL-bacon) | Giacomo Giorgini | Working
 
 Status (Beta)
 
