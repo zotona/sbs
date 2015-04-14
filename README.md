@@ -45,6 +45,7 @@ Moto G XT1031 | Stock 4.4.4              | Devon Mangelsen   | Working
 OnePlus One | CM 20150310-NIGHTLY-bacon | Ben Mooney | Working
 OnePlus One | CM 20150310-NIGHTLY-bacon | Ben Mooney | Working
 OnePlus One | CMOS12 (cm-12.0-YNG1TAS0YL-bacon) | Giacomo Giorgini | Working
+SG Note 4   | CM 20150413-NIGHTLY-trlexx | Tomas Gimenez Alsina | Working
 
 Status (Beta)
 
