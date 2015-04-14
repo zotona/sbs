@@ -361,7 +361,7 @@ public class MainActivity extends Activity implements
         emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
                 "This is a log from SBS");
-        this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+        this.startActivityForResult(Intent.createChooser(emailIntent, "Sending email..."),0);
 
     }
 
