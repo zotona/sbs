@@ -18,7 +18,7 @@
         </activity>
         <service
             android:name=".Service"
-            android:exported="false" >
+            android:exported="true" >
         </service>
     </application>
 </manifest>
