@@ -7,12 +7,12 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 19
-        versionCode 6
-        versionName "1.5"
+        versionCode 13
+        versionName "1.12"
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -27,7 +27,7 @@ task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native
     into 'lib/'
 }
 
-tasks.withType(Compile) {
+tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }
 
@@ -36,4 +36,8 @@ dependencies {
     //compile 'com.android.support:support-v4:19.+'
 }
 
+<<<<<<< HEAD
 //apply from: '../../workspace/signapk.gradle'
+=======
+apply from: '../../workspace/signapk.gradle'
+>>>>>>> frma/master

@@ -9,13 +9,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+<<<<<<< HEAD
 import android.os.AsyncTask;
+=======
+import android.net.Uri;
+>>>>>>> frma/master
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
+<<<<<<< HEAD
+=======
+import android.view.MenuInflater;
+>>>>>>> frma/master
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -23,18 +33,18 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
+<<<<<<< HEAD
 import com.ahmet.autoswitch.AutoSwitchList;
 
+=======
+>>>>>>> frma/master
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 class SBSException extends Exception {
     public int mErrcode;
@@ -47,11 +57,11 @@ class SBSException extends Exception {
     }
 }
 
-public class MainActivity extends Activity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
-    private SharedPreferences mPrefs;
-    private int mScreenHeight;
-    private int mScreenWidth;
-
+public class MainActivity extends Activity implements
+        View.OnClickListener,
+        CompoundButton.OnCheckedChangeListener,
+        SeekBar.OnSeekBarChangeListener
+{
     private Button mInstallBtn;
     private Button mRebootBtn;
     private CheckBox mLoadNextCB;
@@ -62,12 +72,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
     private TextView mZoomFactor;
     private SeekBar mImgDistSeekBar;
     private TextView mImgDistValue;
-    private int mImgDistance;
-    private DisplayMetrics mDisplayMetrics;
 
-    private int mZoom;
-    private boolean mEnabled = false;
     private ProgressDialog mProgress;
+
+    private boolean mInstalled;
+    private boolean mEnabled;
+    private boolean mPermanent;
+    private boolean mLoaded;
+    private boolean mActive;
+    private int mZoom;
+    private int mImgDist;
+    private BroadcastReceiver mBReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +90,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         setContentView(R.layout.activity_main);
 
         // Get screen width and height
+<<<<<<< HEAD
         mDisplayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+=======
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+>>>>>>> frma/master
 
         mInstallBtn = (Button)findViewById(R.id.install);
         mRebootBtn =  (Button)findViewById(R.id.reboot);
@@ -101,19 +121,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         mActivateTB.setOnCheckedChangeListener(this);
 
         mZoomSeekBar.setOnSeekBarChangeListener(this);
-        mZoom = mPrefs.getInt("zoom", 255);
-        mZoomSeekBar.setProgress(mZoom);
 
         mImgDistSeekBar.setOnSeekBarChangeListener(this);
-        mImgDistance = mPrefs.getInt("imgdist", 60);
-        mImgDistSeekBar.setProgress(mImgDistance);
-
-        mImgDistSeekBar.setMax((int) ((float) mDisplayMetrics.heightPixels / mDisplayMetrics.ydpi * 25.4));
+        mImgDistSeekBar.setMax((int) ((float) displayMetrics.heightPixels / displayMetrics.ydpi * 25.4));
 
         mProgress = new ProgressDialog(this);
-
+        mProgress.setMessage("Configuring...");
         copyAssets("armeabi");
 
+<<<<<<< HEAD
         updateStatus();
 
         /*
@@ -149,126 +165,114 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
             boolean loadOnBoot;
             boolean loadOnBootPermanent;
             boolean loaded;
-
-            @Override
-            protected Integer doInBackground(Void... voids) {
-                installed = isInstalled();
-                loadOnBoot = isLoadOnBootEnabled();
-                loadOnBootPermanent = isLoadOnBootPermanent();
-                loaded = isLoaded();
-                return 0;
-            }
-
-            @Override
-            protected void onPostExecute(Integer integer) {
-                super.onPostExecute(integer);
-                mInItemUpdate = true;
-                if (installed)
-                    mInstallBtn.setText("Uninstall");
-                else
-                    mInstallBtn.setText("Install");
-                mLoadNextCB.setChecked(loadOnBoot);
-                mPermanentCB.setChecked(loadOnBootPermanent);
-                String statusText = "SBS ";
-                statusText += (installed ?
-                               ("is installed" + (loaded ? " and loaded": " but not loaded")) :
-                               "is not installed");
-                mCurrentStatusTV.setText(statusText);
-                mZoomSeekBar.setEnabled(loaded);
-                mImgDistSeekBar.setEnabled(loaded);
-                mActivateTB.setEnabled(loaded);
-                mInItemUpdate = false;
-            }
-        }.execute();
+=======
     }
-    private void commit() {
-        new AsyncTaskWUIandE("Updating...") {
-            @Override
-            protected Integer doInBackgroundE(Void... voids) throws SBSException {
-                int rv = -1;
-                rv = runAndCheckSBSCmd(String.format("set %d %d %d", mEnabled ? 1 : 0, mZoom,
-                        (int) (mImgDistance / 25.4 * mDisplayMetrics.xdpi)));
-                return rv;
-            }
+>>>>>>> frma/master
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBReceiver = new BroadcastReceiver() {
             @Override
-            protected void onPostExecute(Integer integer) {
-                super.onPostExecute(integer);
+            public void onReceive(Context context, Intent intent) {
+                if(Service.SBS_NEW_STATUS.equals(intent.getAction())) {
+                    handleStatusIntent(intent);
+                }
             }
-        }.execute();
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Service.SBS_NEW_STATUS);
+        registerReceiver(mBReceiver, filter);
+        mProgress.show();
+        Service.ctrlSBS(this, "ping");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mBReceiver);
+    }
+
+    private boolean mInItemUpdate = false;
+
+    private void handleStatusIntent(Intent intent) {
+        mProgress.dismiss();
+        logi("Handle status intent");
+        mInstalled = intent.getBooleanExtra("INSTALLED", false);
+        mEnabled   = intent.getBooleanExtra("ENABLED", false);
+        mPermanent = intent.getBooleanExtra("PERMANENT", false);
+        mLoaded    = intent.getBooleanExtra("LOADED", false);
+        mActive    = intent.getBooleanExtra("ACTIVE", false);
+        mZoom      = intent.getIntExtra("ZOOM", 100);
+        mImgDist   = intent.getIntExtra("IMGDIST", 60);
+
+        updateUI();
+    }
+
+    private void updateUI() {
+        mInItemUpdate = true;
+        if (mInstalled)
+            mInstallBtn.setText("Uninstall");
+        else
+            mInstallBtn.setText("Install");
+        mLoadNextCB.setChecked(mEnabled);
+        mPermanentCB.setChecked(mPermanent);
+        String statusText = "SBS ";
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            statusText += "v" + pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        statusText += (mInstalled ?
+                        (" is installed" + (mLoaded ? " and loaded": " but not loaded")) :
+                               " is not installed");
+        mCurrentStatusTV.setText(statusText);
+        mZoomSeekBar.setEnabled(mLoaded);
+        mZoomSeekBar.setProgress(mZoom);
+        mImgDistSeekBar.setEnabled(mLoaded);
+        mImgDistSeekBar.setProgress(mImgDist);
+        mActivateTB.setEnabled(mLoaded);
+        mInItemUpdate = false;
     }
 
     @Override
     public void onClick(View v) {
         if(v.equals(mInstallBtn)) {
-            if (isInstalled())
-                uninstall();
+            if (mInstalled)
+                showUninstallDlg();
             else
-                install();
+                showInstallDlg();
         }
         else if(v.equals(mRebootBtn)) {
-            new AsyncTaskWUIandE("Rebooting...") {
-                @Override
-                protected Integer doInBackgroundE(Void... voids) throws Exception {
-                    doReboot();
-                    Thread.sleep(100000);
-                    return 0;
-                }
-            }.execute();
-
+            showRebootDlg();
         }
-        updateStatus();
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        final boolean fIsChecked = isChecked;
-
         if(mInItemUpdate)
             return;
         if(buttonView.equals(mLoadNextCB)) {
-            new AsyncTaskWUIandE(fIsChecked?"Enabling...":"Disabling...")  {
-                @Override
-                protected Integer doInBackgroundE(Void... voids) throws SBSException {
-                    int rv = -1;
-                    if (fIsChecked) rv = runAndCheckSBSCmd("enable");
-                    else rv = runAndCheckSBSCmd("disable");
-                    return rv;
-                }
-
-                @Override
-                protected void onPostExecute(Integer integer) {
-                    super.onPostExecute(integer);
-                    mInItemUpdate = true;
-                    if(!mLoadNextCB.isChecked())
-                        mPermanentCB.setChecked(false);
-                    mInItemUpdate = false;
-                }
-            }.execute();
+            mProgress.show();
+            if (mEnabled) {
+                Service.ctrlSBS(this, "disable");
+            } else {
+                Service.ctrlSBS(this, "enablenext");
+            }
         }
         if(buttonView.equals(mPermanentCB)) {
-            new AsyncTaskWUIandE(isChecked?"Enabling...":"Disabling...") {
-                @Override
-                protected Integer doInBackgroundE(Void... voids) throws Exception {
-                    int rv = -1;
-                    if (fIsChecked) rv = runAndCheckSBSCmd("enablepermanent");
-                    else rv = runAndCheckSBSCmd("disable");
-                    return rv;
-                }
-
-                    @Override
-                protected void onPostExecute(Integer integer) {
-                    super.onPostExecute(integer);
-                        mInItemUpdate = true;
-                        mLoadNextCB.setChecked(mPermanentCB.isChecked());
-                        mInItemUpdate = false;
-                }
-            }.execute();
-        };
+            mProgress.show();
+            if (mPermanent) {
+                Service.ctrlSBS(this, "disable");
+            } else {
+                Service.ctrlSBS(this, "enablepermanent");
+            }
+        }
         if(buttonView.equals(mActivateTB)) {
-            mEnabled = isChecked;
-            mPrefs.edit().putBoolean("enabled", mEnabled).commit();
-            commit();
+            mProgress.show();
+            Service.setSBS(this, isChecked, mZoom, mImgDist);
         }
     }
     public void enable()
@@ -285,16 +289,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
     }
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-        if (seekBar == mZoomSeekBar) {
-            mZoom = progress;
-            if (mZoom < 128)
-                mZoom = 128;
-            mPrefs.edit().putInt("zoom", mZoom).commit();
-            mZoomFactor.setText("" + 100 * mZoom / 255 + "%");
-        } else if (seekBar == mImgDistSeekBar) {
-            mImgDistance = progress;
-            mPrefs.edit().putInt("imgdist", mImgDistance).commit();
-            mImgDistValue.setText(mImgDistance + "mm");
+        if (seekBar == mImgDistSeekBar) {
+            mImgDistValue.setText("" + progress + " mm");
+        }
+        else if(seekBar == mZoomSeekBar) {
+            mZoomFactor.setText("" + 100*progress/255 + "%");
         }
     }
 
@@ -304,11 +303,26 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        if(mEnabled)
-            commit();
+        if(mInItemUpdate)
+            return;
+        if (seekBar == mImgDistSeekBar) {
+            mProgress.show();
+            Service.setSBS(this, mActive, mZoom, seekBar.getProgress());
+        }
+        else if(seekBar == mZoomSeekBar) {
+            mProgress.show();
+            Service.setSBS(this, mActive, seekBar.getProgress(), mImgDist);
+        }
     }
 
-    private void uninstall() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void showUninstallDlg() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Uninstall and reboot device ?")
@@ -316,20 +330,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
                 .setPositiveButton("Go", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new AsyncTaskWUIandE("Uninstalling...") {
-                            @Override
-                            protected Integer doInBackgroundE(Void... voids) throws SBSException {
-                                doUninstall();
-                                return null;
-                            }
-                        }.execute();
+                        mProgress.show();
+                        Service.ctrlSBS(MainActivity.this, "uninstall");
                     }
-
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    private void install() {
+    private void showInstallDlg() {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Install and restart UI ?")
@@ -337,88 +345,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
                 .setPositiveButton("Go", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new AsyncTaskWUIandE("Installing...") {
-
-                            @Override
-                            protected Integer doInBackgroundE(Void... voids) throws Exception {
-                                doInstall();
-                                return 0;
-                            }
-
-
-                        }.execute();
+                        mProgress.show();
+                        Service.ctrlSBS(MainActivity.this, "install");
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    private int runAsRoot(String cmd) {
-        int rv = -1;
-        logi("RunAsRoot: " + cmd);
-        try {
-            Process process =
-                Runtime.getRuntime().exec(new String[] {"su", "-mm", "-c", cmd});
-            rv = process.waitFor();
-            logi("runAsRoot returned " + rv);
-        } catch (Exception e) {
-            logi("Failed to run as root with exception: " + e.getMessage());
-            Toast.makeText(this, "Failed to run as root", Toast.LENGTH_LONG).show();
-        }
-        return rv;
+    private void showRebootDlg() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Reboot device ?")
+                .setMessage("Are you sure you want to reboot this device")
+                .setPositiveButton("Go", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mProgress.show();
+                        Service.ctrlSBS(MainActivity.this, "reboot");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
-    private int runSBSCmd(String cmd) {
-        String path = getFilesDir().getAbsolutePath();
-        return runAsRoot(path + "/sbs.sh " + cmd);
-    }
-    private int runAndCheckSBSCmd(String cmd) throws SBSException {
-        int rv = runSBSCmd(cmd);
-        if(rv != 0) {
-            throw new SBSException("SBS Command failed with error " + rv, rv);
-        }
-        return rv;
-    }
-    private void doInstall() throws SBSException {
-        int rv = 0;
-        if(!isInstalled())
-            rv = runAndCheckSBSCmd("install");
-        if(rv == 0)
-            rv = runAndCheckSBSCmd("enable");
-        if(rv == 0)
-            rv = runAndCheckSBSCmd("reboot");
-    }
-    private void doUninstall() throws SBSException
-    {
-        int rv = 0;
-        if(isInstalled())
-            rv = runAndCheckSBSCmd("uninstall");
-        if(rv == 0)
-            rv = runAndCheckSBSCmd("reboot");
-    }
-    private void doReboot() throws SBSException
-    {
-        runAndCheckSBSCmd("reboot");
-    }
-    private boolean isInstalled() {
-        int rv = -1;
-        rv = runSBSCmd("isinstalled");
-        return rv == 0;
-    }
-    private boolean isLoadOnBootEnabled() {
-        int rv = -1;
-        rv = runSBSCmd("isenabled");
-        return rv == 0;
-    }
-    private boolean isLoadOnBootPermanent() {
-        int rv = -1;
-        rv = runSBSCmd("ispermanent");
-        return rv == 0;
-    }
-    private boolean isLoaded() {
-        int rv = -1;
-        rv = runSBSCmd("isloaded");
-        return rv == 0;
-    }
-
     // Asset stuff
     private void copyAssets(String path) {
         AssetManager assetManager = getAssets();
@@ -470,81 +418,30 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         Log.e("SBS", msg);
     }
 
-    // Async  helper classes
-    abstract class AsyncTaskWUI extends AsyncTask<Void,String,Integer> {
-        ProgressDialog mProgress;
-        String mText;
-        AsyncTaskWUI(String text) {
-            super();
-            mText = text;
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgress = ProgressDialog.show(MainActivity.this, "Wait...", mText, true);
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            mProgress.dismiss();
-        }
-    };
-    abstract class AsyncTaskWUIandE extends AsyncTaskWUI {
-        protected Exception mException;
-
-        AsyncTaskWUIandE(String text) {
-            super(text);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mException = null;
-        }
-        abstract protected Integer doInBackgroundE(Void... voids) throws Exception;
-        @Override
-        protected Integer doInBackground(Void... voids) {
-            try {
-                doInBackgroundE(voids);
-            }
-            catch(Exception e) {
-                mException = e;
-            }
-            return 0;
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-            if(mException != null) {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("SBS Failed")
-                        .setMessage(mException.getMessage())
-                        .show();
-                //sendReport();
-            }
-        }
-    };
+;
+;
     private void sendReport() {
         final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
         emailIntent.setType("plain/text");
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
                 new String[] { "fredrik.markstrom@gmail.com" });
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-                "A log from SBS");
-        URI uri = null;
-        try {
-            uri = new URI("file:///"+getFilesDir()+"/sbs-log.txt");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        if (uri != null) {
-            emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        }
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "A log from SBS");
+        Uri uri = Uri.parse("file:///"+getFilesDir()+"/sbs-log.txt");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
                 "This is a log from SBS");
-        this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+        this.startActivityForResult(Intent.createChooser(emailIntent, "Sending email..."),0);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.sendLog) {
+            sendReport();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
