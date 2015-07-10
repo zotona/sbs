@@ -70,6 +70,7 @@ CMVER=$(getprop ro.cm.version)
 log "VER:$VER CMVER:$CMVER"
 echo "$VER"   | grep "^4.4" > /dev/null && VARIANT=aosp444_r2
 echo "$VER"   | grep "^5.0" > /dev/null && VARIANT=aosp501_r1
+echo "$VER"   | grep "^5.1" > /dev/null && VARIANT=aosp511_r4
 echo "$CMVER" | grep "^11"  > /dev/null && VARIANT=cm11m12
 echo "$CMVER" | grep "^12"  > /dev/null && VARIANT=cm12
 

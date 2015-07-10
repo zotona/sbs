@@ -8,24 +8,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-<<<<<<< HEAD
-import android.os.AsyncTask;
-=======
 import android.net.Uri;
->>>>>>> frma/master
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
-<<<<<<< HEAD
-=======
 import android.view.MenuInflater;
->>>>>>> frma/master
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -35,11 +26,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-<<<<<<< HEAD
-import com.ahmet.autoswitch.AutoSwitchList;
-
-=======
->>>>>>> frma/master
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,15 +76,8 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
 
         // Get screen width and height
-<<<<<<< HEAD
-        mDisplayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
-
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-=======
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
->>>>>>> frma/master
 
         mInstallBtn = (Button)findViewById(R.id.install);
         mRebootBtn =  (Button)findViewById(R.id.reboot);
@@ -129,45 +108,7 @@ public class MainActivity extends Activity implements
         mProgress.setMessage("Configuring...");
         copyAssets("armeabi");
 
-<<<<<<< HEAD
-        updateStatus();
-
-        /*
-         *  Registering BroadcastReceiver for communication with AppWatcher Service
-         *  Filtering to get only DISABLE and ENABLE commands
-         */
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.ahmet.autoswitch.DISABLE");
-        filter.addAction("com.ahmet.autoswitch.ENABLE");
-        registerReceiver(receiver,filter);
     }
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context,Intent intent)
-        {
-            String action = intent.getAction();
-            if(action.equals("com.ahmet.autoswitch.ENABLE")) {
-                enable();
-            }
-            else
-            {
-                disable();
-            }
-            Log.d("ATS", "Intent Handled");
-        }
-    };
-    boolean mInItemUpdate = false;
-    private void updateStatus() {
-        new AsyncTaskWUI("Reading status...") {
-            boolean installed;
-            boolean loadOnBoot;
-            boolean loadOnBootPermanent;
-            boolean loaded;
-=======
-    }
->>>>>>> frma/master
 
     @Override
     protected void onResume() {
@@ -236,7 +177,6 @@ public class MainActivity extends Activity implements
         mActivateTB.setEnabled(mLoaded);
         mInItemUpdate = false;
     }
-
     @Override
     public void onClick(View v) {
         if(v.equals(mInstallBtn)) {
@@ -275,18 +215,7 @@ public class MainActivity extends Activity implements
             Service.setSBS(this, isChecked, mZoom, mImgDist);
         }
     }
-    public void enable()
-    {
-        mEnabled = true;
-        mPrefs.edit().putBoolean("enabled", true).commit();
-        commit();
-    }
-    public void disable()
-    {
-        mEnabled = false;
-        mPrefs.edit().putBoolean("disabled", true).commit();
-        commit();
-    }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
         if (seekBar == mImgDistSeekBar) {
@@ -439,27 +368,6 @@ public class MainActivity extends Activity implements
         int id = item.getItemId();
         if(id == R.id.sendLog) {
             sendReport();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.auto_switch_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent i=new Intent(MainActivity.this, AutoSwitchList.class);
-            startActivity(i);
             return true;
         }
         return super.onOptionsItemSelected(item);

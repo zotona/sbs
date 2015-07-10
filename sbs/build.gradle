@@ -36,8 +36,4 @@ dependencies {
     //compile 'com.android.support:support-v4:19.+'
 }
 
-<<<<<<< HEAD
-//apply from: '../../workspace/signapk.gradle'
-=======
 apply from: '../../workspace/signapk.gradle'
->>>>>>> frma/master
