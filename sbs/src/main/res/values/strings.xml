@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <eat-comment />
-
     <string name="app_name">SBS</string>
-    <string name="title_activity_auto_switch_list">AutoSwitcher</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">AutoSwitcher</string>
-
 </resources>
